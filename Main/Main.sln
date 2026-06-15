@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36705.20 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Main", "Main\Main.pyproj", "{F279619F-3F4F-4378-902B-F0304720C450}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Curve25519", "Curve25519", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "ecdh", "ecdh\ECDH.pyproj", "{66826C9C-FE52-478B-A1F3-0C35BC444391}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Math_Engine", "Math_Engine\Math_Engine.pyproj", "{3D214B86-BF54-4514-9BCE-961AB4CD4016}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "aead", "aead\aead.pyproj", "{D7A79B8C-4B94-45EA-A470-9E5C1EF1AFAE}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "__init__", "__init__\__init__.pyproj", "{648BAF8A-0441-4089-A053-E7CBED5E6292}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F279619F-3F4F-4378-902B-F0304720C450}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F279619F-3F4F-4378-902B-F0304720C450}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66826C9C-FE52-478B-A1F3-0C35BC444391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66826C9C-FE52-478B-A1F3-0C35BC444391}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D214B86-BF54-4514-9BCE-961AB4CD4016}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D214B86-BF54-4514-9BCE-961AB4CD4016}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7A79B8C-4B94-45EA-A470-9E5C1EF1AFAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7A79B8C-4B94-45EA-A470-9E5C1EF1AFAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{648BAF8A-0441-4089-A053-E7CBED5E6292}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{648BAF8A-0441-4089-A053-E7CBED5E6292}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{66826C9C-FE52-478B-A1F3-0C35BC444391} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{3D214B86-BF54-4514-9BCE-961AB4CD4016} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{D7A79B8C-4B94-45EA-A470-9E5C1EF1AFAE} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{648BAF8A-0441-4089-A053-E7CBED5E6292} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4184BE76-094C-4616-B0AF-FCC2F339C1B3}
+	EndGlobalSection
+EndGlobal
