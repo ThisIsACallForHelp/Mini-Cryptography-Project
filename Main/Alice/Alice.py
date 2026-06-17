@@ -1,9 +1,12 @@
 import asyncio 
 from asyncio import exceptions
 import os 
+import sys
 import websockets
-from ECDH import ECDH
-from aead import EncryptMSG, UnpackPoly1305Key, GeneratePoly1305Tag, ChaCha20_Encrypt
+solution_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(solution_root)
+from ecdh.ecdh import GeneratePrivateKey, GeneratePublicKey, ComputeSharedSecret
+from aead.aead import EncryptMSG, UnpackPoly1305Key, GeneratePoly1305Tag, ChaCha20_Encrypt
 
 def DecryptMSG(shared_key, nonce, ciphertext, expected_tag):
     _, poly_key = ChaCha20_Encrypt(shared_key, nonce, b"")
@@ -17,21 +20,22 @@ def DecryptMSG(shared_key, nonce, ciphertext, expected_tag):
     return plaintext
 
 async def main():
-    uri = "ws://localhost:8675"
+    uri = "ws://localhost:8765"
     print(f"Hello Alice. connecting to bob at {uri}")
     async with websockets.connect(uri) as websocket:
         print("Alice has connected. establishing handshake...")
-        alice_priv, alice_pub = ECDH.GeneratePrivateKey(), ECDH.GeneratePublicKey()
+        alice_priv = GeneratePrivateKey()
+        alice_pub = GeneratePublicKey(alice_priv)
         await websocket.send(alice_pub)
 
         bob_pub_bytes = await websocket.recv()
-        shared_key = ECDH.ComputeSharedSecret(alice_priv, bob_pub_bytes)
-        print("Shared secret established")
+        shared_key = ComputeSharedSecret(alice_priv, bob_pub_bytes)
+        print(f"Shared secret established -> {shared_key}")
 
         async def recieve_loop():
             try:
                 async for payload in websocket:
-                    nonce, tag, ciphertext = payload[0:12], payload[12:28], ciphertext[28:]
+                    nonce, tag, ciphertext = payload[0:12], payload[12:28], payload[28:]
                     try:
                         plaintext = DecryptMSG(shared_key, nonce, ciphertext, tag)
                         print(f"Bob: {plaintext.decode('utf-8')}")
@@ -44,7 +48,7 @@ async def main():
             loop = asyncio.get_event_loop()
             try:
                 while True:
-                    message = await loop.run_in_executor(None, input, "type a message, Alice")
+                    message = await loop.run_in_executor(None, input, "type a message, Alice ")
                     if not message:
                         continue
                     nonce = os.urandom(12)
@@ -52,7 +56,7 @@ async def main():
                     payload = nonce + tag + ciphertext
                     await websocket.send(payload)
             except Exception as e:
-                print("Couldnt send your message, bob")
+                print("Couldnt send your message, Alice")
         await asyncio.gather(recieve_loop(), send_loop())
 
 if __name__ == "__main__":

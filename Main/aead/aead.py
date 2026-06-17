@@ -1,5 +1,6 @@
 from ctypes.wintypes import BYTE
-from ECDH import ECDH
+import sys
+import os
 
 
 def Quarter_Round(x,a,b,c,d):
@@ -53,19 +54,24 @@ def ChaCha20_block(ChaChaMatrix):
     return matrix_bytes
 
 
-def ChaCha20_Encrypt(shared_key, nonce_bytes, plaintext): #we generate the unique keys here
-    matrix = ChaCha20(shared_key, nonce_bytes)
-
-    block_0 = ChaCha20_block(matrix)
+def ChaCha20_Encrypt(shared_key, nonce_bytes, plaintext):
+    base_matrix = ChaCha20(shared_key, nonce_bytes)
+    matrix_block_0 = list(base_matrix)
+    matrix_block_0[12] = 0
+    block_0 = ChaCha20_block(matrix_block_0)
     poly_1305_key = block_0[0:32]
-    matrix[12],ciphertext, m_length = 1, b"", len(plaintext)
-
-    for i in range(0,m_length, 64):
+    ciphertext = b""
+    m_length = len(plaintext)
+    block_counter = 1
+    for i in range(0, m_length, 64):
         chunk = plaintext[i : i + 64]
-        keystream = ChaCha20_block(matrix)
+        current_matrix = list(base_matrix)
+        current_matrix[12] = block_counter
+        keystream = ChaCha20_block(current_matrix)
         for j in range(len(chunk)):
             ciphertext += bytes([chunk[j] ^ keystream[j]])
-        matrix[12] = (matrix[12] + 1) & 0xffffffff
+        block_counter = (block_counter + 1) & 0xffffffff
+        
     return ciphertext, poly_1305_key
 
 def UnpackPoly1305Key(Poly_1305_Bytes):

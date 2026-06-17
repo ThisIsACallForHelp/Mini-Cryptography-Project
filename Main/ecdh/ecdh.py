@@ -14,6 +14,7 @@ def GeneratePublicKey(PrivateKey):
     private_ints = int.from_bytes(PrivateKey, byteorder="little")
     base_x = 9
     final_x = Math_Engine.double_and_add(private_ints, base_x)
+    final_x &= (1 << 255) - 1
     public_bytes = final_x.to_bytes(32,byteorder="little")
     return public_bytes
 
@@ -21,6 +22,7 @@ def GeneratePublicKey(PrivateKey):
 def ComputeSharedSecret(private_bytes, foreign_public_bits):
     private_ints = int.from_bytes(private_bytes, byteorder="little")
     foreign_public_ints = int.from_bytes(foreign_public_bits, byteorder="little")
+    foreign_public_ints &= (1 << 255) - 1 
     final_x = Math_Engine.double_and_add(private_ints, foreign_public_ints)
     computed_bytes = final_x.to_bytes(32, byteorder="little")
     return (hashlib.sha256(computed_bytes)).digest()

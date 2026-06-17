@@ -1,9 +1,11 @@
-from ssl import _Cipher
 import websockets
 import asyncio
 import os
-from ECDH import ECDH
-from aead import EncryptMSG, UnpackPoly1305Key, GeneratePoly1305Tag, ChaCha20_Encrypt
+import sys
+solution_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(solution_root)
+from ecdh.ecdh import GeneratePrivateKey, GeneratePublicKey, ComputeSharedSecret
+from aead.aead import EncryptMSG, UnpackPoly1305Key, GeneratePoly1305Tag, ChaCha20_Encrypt
 
 def DecryptMSG(shared_key, nonce, ciphertext, expected_tag):
     _, poly_key = ChaCha20_Encrypt(shared_key, nonce, b"")
@@ -19,9 +21,11 @@ def DecryptMSG(shared_key, nonce, ciphertext, expected_tag):
 async def handle_alice(websocket):
     print("Bob has established a connection")
     alice_pub_bytes = await websocket.recv()
-    bob_priv, bob_pub = ECDH.GeneratePrivateKey(), ECDH.GeneratePublicKey(bob_priv, alice_pub_bytes)
-    shared_secret = ECDH.ComputeSharedSecret(bob_priv, alice_pub_bytes)
-    print("Bob has shared his secret key with alice")
+    print(f"Alice public key -> {alice_pub_bytes}")
+    bob_priv  = GeneratePrivateKey()
+    bob_pub = GeneratePublicKey(bob_priv)
+    shared_key = ComputeSharedSecret(bob_priv, alice_pub_bytes)
+    print(f"shared secret -> {shared_key}")
     await websocket.send(bob_pub)
     print("completed handshake")
 
@@ -42,11 +46,11 @@ async def handle_alice(websocket):
         loop = asyncio.get_event_loop()
         try:
             while True:
-                message = await loop.run_in_executor(None, input, "type a message, bob")
+                message = await loop.run_in_executor(None, input, "type a message, bob ")
                 if not message:
                     continue
                 nonce = os.urandom(12)
-                ciphertext, tag = EncryptMSG(shared_secret, nonce, message.encode('utf-8'))
+                ciphertext, tag = EncryptMSG(shared_key, nonce, message.encode('utf-8'))
                 payload = nonce + tag + ciphertext
                 await websocket.send(payload)
         except Exception as e:
@@ -55,8 +59,8 @@ async def handle_alice(websocket):
 
 async def main():
     print("Hello, bob. the server starts at port 8765, waiting for Alice...")
-    async with websockets.serve(handle_alice, "localhost", 8765):
-        await asyncio.Future()
+    bob_server = await websockets.serve(handle_alice, "localhost", 8765)
+    await bob_server.wait_closed()
 
 if __name__ == "__main__":
     asyncio.run(main())
